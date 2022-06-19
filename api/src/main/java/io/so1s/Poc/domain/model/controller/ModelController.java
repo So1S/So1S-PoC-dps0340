@@ -1,21 +1,33 @@
 package io.so1s.Poc.domain.model.controller;
 
+import io.so1s.Poc.domain.model.dto.mapper.ModelMapper;
 import io.so1s.Poc.domain.model.dto.request.GitRequestDto;
+import io.so1s.Poc.domain.model.service.ModelService;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/models")
+@RequiredArgsConstructor
 public class ModelController {
 
+    private final ModelService modelService;
+    private final ModelMapper modelMapper;
+
     @PostMapping
-    public ResponseEntity<?> createByGit(@Valid @RequestBody GitRequestDto gitRequestDto) {
+    public ResponseEntity<?> createByGit(@Valid @RequestBody GitRequestDto gitRequestDto) throws GitAPIException, IOException {
+        final var url = gitRequestDto.getUrl();
 
+        final var modelEntity = modelService.cloneGitRepository(url);
 
+        final var modelDto = modelMapper.toResponseDto(modelEntity);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(modelDto);
     }
 
     @PatchMapping("/{id}")
