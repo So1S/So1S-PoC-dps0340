@@ -30,7 +30,7 @@ public class ModelService {
         return tempFolder;
     }
 
-    public void buildImageFromModel(Model model) throws GitAPIException, IOException {
+    synchronized public void buildImageFromModel(Model model) throws GitAPIException, IOException {
         File gitFolder = cloneGitRepository(model);
 
         var folderUrl = gitFolder.toString();
@@ -38,7 +38,13 @@ public class ModelService {
         var builderFolder = gitFolder.toPath().resolve("builder").toFile();
 
 
-        var process = new ProcessBuilder(String.format("BUILD_GIT_REPOSITORY=%s /bin/bash /usr/src/git-repo/builder/load-template.sh", folderUrl)).directory(builderFolder).inheritIO().start();
+        var processBuilder = new ProcessBuilder(String.format("/bin/bash /usr/src/git-repo/builder/load-template.sh", folderUrl)).directory(builderFolder);
+
+        var environment = processBuilder.environment();
+
+        environment.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
+
+        var process = processBuilder.inheritIO().start();
 
         synchronized (process) {
             try {
