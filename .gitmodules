@@ -1,0 +1,3 @@
+[submodule "inference/So1S-PoC-bentoml"]
+	path = inference/So1S-PoC-bentoml
+	url = https://github.com/So1S/So1S-PoC-bentoml
