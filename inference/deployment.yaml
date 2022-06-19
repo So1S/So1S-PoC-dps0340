@@ -6,8 +6,8 @@ metadata:
     app: inference
 spec:
   ports:
-  - port: 5000
-    targetPort: 5005
+  - port: 5005
+    targetPort: 5000
     protocol: TCP
   clusterIP: None
   selector:
@@ -33,3 +33,5 @@ spec:
       - name: inference
         image: so1sservice
         imagePullPolicy: Never
+        ports:
+          - containerPort: 5000
