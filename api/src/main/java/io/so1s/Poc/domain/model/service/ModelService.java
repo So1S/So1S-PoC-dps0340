@@ -4,6 +4,7 @@ import io.so1s.Poc.domain.model.entity.Model;
 import io.so1s.Poc.domain.model.entity.ModelType;
 import io.so1s.Poc.domain.model.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ModelService {
     private final ModelRepository modelRepository;
 
@@ -35,16 +37,15 @@ public class ModelService {
 
         var folderUrl = gitFolder.toString();
 
-        var builderFolder = gitFolder.toPath().resolve("builder").toFile();
+        var builderFolder = new File("/usr/src/git-repo/builder");
 
-
-        var processBuilder = new ProcessBuilder(String.format("/bin/bash /usr/src/git-repo/builder/load-template.sh", folderUrl)).directory(builderFolder);
+        var processBuilder = new ProcessBuilder("/bin/bash", "/usr/src/git-repo/builder/load-template.sh").directory(builderFolder).redirectErrorStream(true);;
 
         var environment = processBuilder.environment();
 
         environment.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
 
-        var process = processBuilder.inheritIO().start();
+        var process = processBuilder.start();
 
         synchronized (process) {
             try {
@@ -54,7 +55,9 @@ public class ModelService {
             }
         }
 
-        process = new ProcessBuilder("skaffold build").directory(builderFolder).inheritIO().start();
+        log.info(new String(process.getInputStream().readAllBytes()));
+
+        process = new ProcessBuilder("kubectl", "delete", "-f", "job.yaml").directory(builderFolder).redirectErrorStream(true).start();
 
         synchronized (process) {
             try {
@@ -63,6 +66,21 @@ public class ModelService {
                 e.printStackTrace();
             }
         }
+
+        log.info(new String(process.getInputStream().readAllBytes()));
+
+        // run builder -> build bentoml images
+        process = new ProcessBuilder("skaffold", "run", "--tail").directory(builderFolder).redirectErrorStream(true).start();
+
+        synchronized (process) {
+            try {
+                process.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        log.info(new String(process.getInputStream().readAllBytes()));
 
     }
 
