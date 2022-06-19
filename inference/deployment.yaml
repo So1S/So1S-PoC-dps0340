@@ -6,7 +6,7 @@ metadata:
     app: inference
 spec:
   ports:
-  - port: 5005
+  - port: 5000
     targetPort: 5000
     protocol: TCP
   clusterIP: None
