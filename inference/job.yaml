@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: builder
+spec:
+  template:
+    spec:
+      containers:
+        - name: builder
+          image: builder
+          command: ["/bin/sh"]
+          args: ["/usr/src/git-repo/run.sh"]
+          volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-socket-volume
+          - mountPath: /usr/src/git-repo
+            name: git-repo
+          securityContext:
+            privileged: true
+      restartPolicy: Never
+      volumes:
+        - name: docker-socket-volume
+          hostPath:
+            path: /var/run/docker.sock
+            type: File
+        - name: git-repo
+          gitRepo:
+            repository: "git@github.com:So1S/So1S-PoC-dps0340.git"
+            revision: "HEAD"
