@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /usr/src/git-repo/inference
+cd /usr/src/git-repo/builder
 
 kubectl delete -f deployment.yaml --wait
 
