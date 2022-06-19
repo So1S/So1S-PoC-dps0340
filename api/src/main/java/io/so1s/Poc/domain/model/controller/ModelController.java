@@ -2,6 +2,7 @@ package io.so1s.Poc.domain.model.controller;
 
 import io.so1s.Poc.domain.model.dto.mapper.ModelMapper;
 import io.so1s.Poc.domain.model.dto.request.GitRequestDto;
+import io.so1s.Poc.domain.model.dto.response.ModelResponseDto;
 import io.so1s.Poc.domain.model.entity.Model;
 import io.so1s.Poc.domain.model.entity.ModelType;
 import io.so1s.Poc.domain.model.service.ModelService;
@@ -22,7 +23,7 @@ public class ModelController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<?> createByGit(@Valid @RequestBody GitRequestDto gitRequestDto) throws GitAPIException, IOException {
+    public ResponseEntity<ModelResponseDto> createByGit(@Valid @RequestBody GitRequestDto gitRequestDto) throws GitAPIException, IOException, InterruptedException {
         final var url = gitRequestDto.getUrl();
 
         final var modelEntity = Model.builder().url(url).modelType(ModelType.GIT).build();

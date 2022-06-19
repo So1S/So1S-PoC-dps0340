@@ -7,11 +7,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.util.IO;
+import org.springframework.boot.logging.Slf4JLoggingSystem;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,56 +37,40 @@ public class ModelService {
         return tempFolder;
     }
 
-    synchronized public void buildImageFromModel(Model model) throws GitAPIException, IOException {
+    public void launchProcess(String[] args, File directory) throws IOException, InterruptedException {
+        var env = new HashMap<String, String>();
+
+        launchProcess(args, directory, env);
+    }
+
+    public void launchProcess(String[] args, File directory, Map<String, String> env) throws IOException, InterruptedException {
+
+        var processBuilder = new ProcessBuilder(args).directory(directory).inheritIO();
+
+        var environment = processBuilder.environment();
+
+        environment.putAll(env);
+
+        var process = processBuilder.start();
+
+        process.waitFor();
+    }
+
+    synchronized public void buildImageFromModel(Model model) throws GitAPIException, IOException, InterruptedException {
         File gitFolder = cloneGitRepository(model);
 
         var folderUrl = gitFolder.toString();
 
         var builderFolder = new File("/usr/src/git-repo/builder");
 
-        var processBuilder = new ProcessBuilder("/bin/bash", "/usr/src/git-repo/builder/load-template.sh").directory(builderFolder).redirectErrorStream(true);;
+        var env = new HashMap<String, String>();
 
-        var environment = processBuilder.environment();
+        env.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
 
-        environment.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
-
-        var process = processBuilder.start();
-
-        synchronized (process) {
-            try {
-                process.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        log.info(new String(process.getInputStream().readAllBytes()));
-
-        process = new ProcessBuilder("kubectl", "delete", "-f", "job.yaml").directory(builderFolder).redirectErrorStream(true).start();
-
-        synchronized (process) {
-            try {
-                process.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        log.info(new String(process.getInputStream().readAllBytes()));
-
+        launchProcess(new String[] {"/bin/bash", "/usr/src/git-repo/builder/load-template.sh"}, builderFolder, env);
+        launchProcess(new String[] {"kubectl", "delete", "-f", "job.yaml"}, builderFolder);
         // run builder -> build bentoml images
-        process = new ProcessBuilder("skaffold", "run", "--tail").directory(builderFolder).redirectErrorStream(true).start();
-
-        synchronized (process) {
-            try {
-                process.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        log.info(new String(process.getInputStream().readAllBytes()));
-
+        launchProcess(new String[] {"skaffold", "run", "--tail"}, builderFolder);
     }
 
 }
