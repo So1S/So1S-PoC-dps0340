@@ -32,6 +32,7 @@ RUN apt update -y
 RUN apt install -y \
     openjdk-17-jre \
     python3.8 \
+    python3.8-distutils \
     docker-ce \
     docker-ce-cli
 
