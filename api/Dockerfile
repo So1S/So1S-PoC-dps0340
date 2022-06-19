@@ -3,7 +3,7 @@ COPY . /usr/src/java-code/
 WORKDIR /usr/src/java-code
 RUN gradle bootJar -i --stacktrace
 
-FROM ubuntu:20.04
+FROM openjdk:17
 EXPOSE 8080
 USER root
 WORKDIR /usr/src/java-app
