@@ -5,20 +5,16 @@ metadata:
 spec:
   template:
     spec:
+    # https://github.com/k3s-io/k3s/issues/1654
+    # https://gist.github.com/tallclair/849601a16cebeee581ef2be50c351841
       initContainers:
         # This container clones the desired git repo to the EmptyDir volume.
         - name: git-clone
           image: alpine/git # Any image with git will do
           args:
             - clone
-            - --single-branch
-            - --
             - https://github.com/So1S/So1S-PoC-dps0340 # Your repo
             - /repo # Put it in the volume
-          securityContext:
-            runAsUser: 1 # Any non-root user will do. Match to the workload.
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
           volumeMounts:
             - name: git-repo
               mountPath: /repo
@@ -27,14 +23,8 @@ spec:
           image: alpine/git # Any image with git will do
           args:
             - clone
-            - --single-branch
-            - --
             - https://github.com/So1S/So1S-PoC-bentoml # Your repo
             - /repo # Put it in the volume
-          securityContext:
-            runAsUser: 1 # Any non-root user will do. Match to the workload.
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
           volumeMounts:
             - name: build-repo
               mountPath: /repo         
@@ -57,7 +47,6 @@ spec:
         - name: docker-socket-volume
           hostPath:
             path: /var/run/docker.sock
-            type: Socket
         - name: git-repo
           emptyDir: {}
         - name: build-repo
