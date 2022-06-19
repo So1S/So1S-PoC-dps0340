@@ -2,8 +2,6 @@ FROM ubuntu:20.04
 
 WORKDIR /usr/src/builder
 
-COPY . .
-
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Seoul
 
@@ -40,5 +38,7 @@ RUN apt install -y \
     kubectl
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.8 get-pip.py
+
+COPY . .
 
 ENTRYPOINT ["/bin/sh", "/usr/src/builder/run.sh"]
