@@ -10,5 +10,4 @@ build:
 deploy:
   kubectl:
     manifests:
-    - deployment.yaml
     - job.yaml
