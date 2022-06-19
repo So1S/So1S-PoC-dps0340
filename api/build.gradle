@@ -35,6 +35,9 @@ dependencies {
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.22'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r'
 }
 
 tasks.named('test') {
