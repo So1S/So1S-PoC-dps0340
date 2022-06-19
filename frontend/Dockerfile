@@ -6,8 +6,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY . .
-RUN
-RUN yarn add -D @swc/cli @swc/core
+RUN yarn
 RUN yarn build
 
 ENTRYPOINT ["yarn", "start"]
