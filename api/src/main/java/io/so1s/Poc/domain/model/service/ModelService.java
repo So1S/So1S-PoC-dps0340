@@ -57,15 +57,11 @@ public class ModelService {
     }
 
     synchronized public void buildImageFromModel(Model model) throws GitAPIException, IOException, InterruptedException {
-        File gitFolder = cloneGitRepository(model);
-
-        var folderUrl = gitFolder.toString();
-
         var builderFolder = new File("/usr/src/git-repo/builder");
 
         var env = new HashMap<String, String>();
 
-        env.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
+        env.put("BUILD_GIT_REPOSITORY", model.getUrl());
 
         launchProcess(new String[] {"/bin/bash", "/usr/src/git-repo/builder/build.sh"}, builderFolder, env);
     }
