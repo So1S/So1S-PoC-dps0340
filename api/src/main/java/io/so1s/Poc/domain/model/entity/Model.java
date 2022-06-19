@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
+@Entity(name = "model")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -26,4 +28,8 @@ public class Model {
     @Enumerated(EnumType.STRING)
     private ModelType modelType = ModelType.DEFAULT;
 
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @Builder.Default
+    private List<ModelData> modelDataList = new ArrayList<>();
 }

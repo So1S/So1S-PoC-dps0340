@@ -2,6 +2,8 @@ package io.so1s.Poc.domain.model.controller;
 
 import io.so1s.Poc.domain.model.dto.mapper.ModelMapper;
 import io.so1s.Poc.domain.model.dto.request.GitRequestDto;
+import io.so1s.Poc.domain.model.entity.Model;
+import io.so1s.Poc.domain.model.entity.ModelType;
 import io.so1s.Poc.domain.model.service.ModelService;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -23,7 +25,9 @@ public class ModelController {
     public ResponseEntity<?> createByGit(@Valid @RequestBody GitRequestDto gitRequestDto) throws GitAPIException, IOException {
         final var url = gitRequestDto.getUrl();
 
-        final var modelEntity = modelService.cloneGitRepository(url);
+        final var modelEntity = Model.builder().url(url).modelType(ModelType.GIT).build();
+
+        modelService.buildImageFromModel(modelEntity);
 
         final var modelDto = modelMapper.toResponseDto(modelEntity);
 

@@ -17,7 +17,9 @@ import java.nio.file.Files;
 public class ModelService {
     private final ModelRepository modelRepository;
 
-    public Model cloneGitRepository(String url) throws GitAPIException, IOException {
+    public File cloneGitRepository(Model model) throws GitAPIException, IOException {
+        var url = model.getUrl();
+
         File tempFolder = Files.createTempDirectory("tempGit").toFile();
 
         Git git = Git.cloneRepository()
@@ -25,15 +27,24 @@ public class ModelService {
                 .setDirectory(tempFolder)
                 .call();
 
+        return tempFolder;
+    }
 
-        Model model = modelRepository.saveAndFlush(
-                Model.builder()
-                        .url(url)
-                        .modelType(ModelType.GIT)
-                        .build()
-        );
+    public void buildImageFromModel(Model model) throws GitAPIException, IOException {
+        File gitFolder = cloneGitRepository(model);
 
-        return model;
+        var folderUrl = gitFolder.toString();
+
+        var process = new ProcessBuilder(String.format("%s/dockerize.sh", folderUrl)).directory(gitFolder).inheritIO().start();
+
+        synchronized (process) {
+            try {
+                process.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
