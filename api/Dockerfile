@@ -3,11 +3,14 @@ COPY . /usr/src/java-code/
 WORKDIR /usr/src/java-code
 RUN gradle bootJar -i --stacktrace
 
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 EXPOSE 8080
 USER root
 WORKDIR /usr/src/java-app
 COPY --from=builder /usr/src/java-code/build/libs/*.jar ./app.jar
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Seoul
 
 RUN apt update -y
 
@@ -29,8 +32,9 @@ RUN apt update -y
 RUN apt install -y \
     openjdk-17-jre \
     python3.8 \
-    python3.8-pip \
     docker-ce \
     docker-ce-cli
+
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.8 get-pip.py
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
