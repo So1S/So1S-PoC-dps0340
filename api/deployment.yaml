@@ -8,7 +8,6 @@ spec:
   ports:
   - port: 8080
     protocol: TCP
-  clusterIP: None
   selector:
     app: api
 ---
