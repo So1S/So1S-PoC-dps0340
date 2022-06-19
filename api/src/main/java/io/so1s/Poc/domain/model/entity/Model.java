@@ -1,19 +1,29 @@
 package io.so1s.Poc.domain.model.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Model {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    @Id
-    public Long getId() {
-        return id;
-    }
+    @Builder.Default
+    private String url = "";
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private ModelType modelType = ModelType.DEFAULT;
+
 }
