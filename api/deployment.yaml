@@ -28,12 +28,29 @@ spec:
       labels:
         app: api
     spec:
+      # https://stackoverflow.com/questions/42642170/how-to-run-kubectl-commands-inside-a-container
+      serviceAccountName: builder-role
+      # https://github.com/k3s-io/k3s/issues/1654
+      # https://gist.github.com/tallclair/849601a16cebeee581ef2be50c351841
+      initContainers:
+        # This container clones the desired git repo to the EmptyDir volume.
+        - name: git-clone
+          image: alpine/git # Any image with git will do
+          args:
+            - clone
+            - https://github.com/So1S/So1S-PoC-dps0340 # Your repo
+            - /repo # Put it in the volume
+          volumeMounts:
+            - name: git-repo
+              mountPath: /repo
       containers:
       - name: api
         image: api
         volumeMounts:
         - mountPath: /var/run/docker.sock
           name: docker-socket-volume
+        - mountPath: /usr/src/git-repo
+          name: git-repo
         securityContext:
           privileged: true
       volumes:
@@ -41,3 +58,23 @@ spec:
           hostPath:
             path: /var/run/docker.sock
             type: File
+        - name: git-repo
+          emptyDir: {}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: api-server-role
+subjects:
+- kind: ServiceAccount
+  name: api-server-role
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-server-role
