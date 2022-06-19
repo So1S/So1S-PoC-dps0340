@@ -9,7 +9,7 @@ spec:
         - name: builder
           image: builder
           command: ["/bin/sh"]
-          args: ["/usr/src/git-repo/run.sh"]
+          args: ["/usr/src/git-repo/inference/run.sh"]
           volumeMounts:
           - mountPath: /var/run/docker.sock
             name: docker-socket-volume
