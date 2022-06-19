@@ -36,7 +36,8 @@ RUN apt install -y \
     python3.8-distutils \
     python-is-python3 \
     docker-ce \
-    docker-ce-cli
+    docker-ce-cli \
+    kubectl
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.8 get-pip.py
 
