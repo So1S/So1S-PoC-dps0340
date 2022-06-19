@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 public class ModelMapper {
     public ModelResponseDto toResponseDto(Model model) {
         return ModelResponseDto.builder()
+                .id(model.getId())
+                .url(model.getUrl())
+                .modelType(model.getModelType())
                 .build();
     }
 }
