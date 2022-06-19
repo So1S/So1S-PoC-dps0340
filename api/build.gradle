@@ -38,6 +38,7 @@ dependencies {
 
 
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r'
+	implementation 'io.fabric8:kubernetes-client:6.0.0-RC1'
 }
 
 tasks.named('test') {
