@@ -28,7 +28,7 @@ spec:
         app: api
     spec:
       # https://stackoverflow.com/questions/42642170/how-to-run-kubectl-commands-inside-a-container
-      serviceAccountName: builder-role
+      serviceAccountName: api-server-role
       # https://github.com/k3s-io/k3s/issues/1654
       # https://gist.github.com/tallclair/849601a16cebeee581ef2be50c351841
       initContainers:
