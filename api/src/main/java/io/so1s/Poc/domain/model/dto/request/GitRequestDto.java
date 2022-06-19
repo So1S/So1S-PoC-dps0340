@@ -13,5 +13,6 @@ import javax.validation.constraints.NotNull;
 public class GitRequestDto {
 
     @NotNull
+    @Builder.Default
     private String url = "";
 }
