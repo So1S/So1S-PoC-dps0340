@@ -5,6 +5,39 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        # This container clones the desired git repo to the EmptyDir volume.
+        - name: git-clone
+          image: alpine/git # Any image with git will do
+          args:
+            - clone
+            - --single-branch
+            - --
+            - https://github.com/So1S/So1S-PoC-dps0340 # Your repo
+            - /repo # Put it in the volume
+          securityContext:
+            runAsUser: 1 # Any non-root user will do. Match to the workload.
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: git-repo
+              mountPath: /repo
+        # This container clones the desired git repo to the EmptyDir volume.
+        - name: build-clone
+          image: alpine/git # Any image with git will do
+          args:
+            - clone
+            - --single-branch
+            - --
+            - https://github.com/So1S/So1S-PoC-bentoml # Your repo
+            - /repo # Put it in the volume
+          securityContext:
+            runAsUser: 1 # Any non-root user will do. Match to the workload.
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: build-repo
+              mountPath: /repo         
       containers:
         - name: builder
           image: builder
@@ -15,6 +48,8 @@ spec:
             name: docker-socket-volume
           - mountPath: /usr/src/git-repo
             name: git-repo
+          - mountPath: /usr/src/build-repo
+            name: build-repo
           securityContext:
             privileged: true
       restartPolicy: Never
@@ -22,8 +57,8 @@ spec:
         - name: docker-socket-volume
           hostPath:
             path: /var/run/docker.sock
-            type: File
+            type: Socket
         - name: git-repo
-          gitRepo:
-            repository: "git@github.com:So1S/So1S-PoC-dps0340.git"
-            revision: "HEAD"
+          emptyDir: {}
+        - name: build-repo
+          emptyDir: {}

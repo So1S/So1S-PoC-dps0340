@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
-CURR_DIR=$(pwd)
+cd /usr/src/git-repo/inference
 
 kubectl delete -f deployment.yaml --wait
 
-conda deactivate
-conda deactivate
-conda activate poc
-
-cd ./So1S-PoC-bentoml
+cd /usr/src/build-repo
 ./dockerize.sh
+
+cd /usr/src/git-repo/inference
 
 kubectl apply -f deployment.yaml --wait
