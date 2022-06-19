@@ -1,0 +1,26 @@
+apiVersion: skaffold/v2beta28
+kind: Config
+metadata:
+  name: so-s-poc
+build:
+  artifacts:
+  - image: api
+    context: api
+    docker:
+      dockerfile: Dockerfile
+  - image: frontend
+    context: frontend
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - api/deployment.yaml
+    - frontend/deployment.yaml
+portForward:
+- resourceType: service
+  resourceName: api
+  port: 8080
+- resourceType: service
+  resourceName: frontend
+  port: 3000
