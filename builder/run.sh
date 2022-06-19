@@ -2,9 +2,6 @@
 
 cd /usr/src/git-repo/inference
 
-systemctl enable docker
-systemctl start docker
-
 kubectl delete -f deployment.yaml --wait
 
 cd /usr/src/build-repo
