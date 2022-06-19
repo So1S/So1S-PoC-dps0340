@@ -1,0 +1,73 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: builder
+spec:
+  template:
+    spec:
+      # https://stackoverflow.com/questions/42642170/how-to-run-kubectl-commands-inside-a-container
+      serviceAccountName: builder-role
+      # https://github.com/k3s-io/k3s/issues/1654
+      # https://gist.github.com/tallclair/849601a16cebeee581ef2be50c351841
+      initContainers:
+        # This container clones the desired git repo to the EmptyDir volume.
+        - name: git-clone
+          image: alpine/git # Any image with git will do
+          args:
+            - clone
+            - https://github.com/So1S/So1S-PoC-dps0340 # Your repo
+            - /repo # Put it in the volume
+          volumeMounts:
+            - name: git-repo
+              mountPath: /repo
+        # This container clones the desired git repo to the EmptyDir volume.
+        - name: build-clone
+          image: alpine/git # Any image with git will do
+          args:
+            - clone
+            - $BUILD_GIT_REPOSITORY # Your repo
+            - /repo # Put it in the volume
+          volumeMounts:
+            - name: build-repo
+              mountPath: /repo         
+      containers:
+        - name: builder
+          image: builder
+          command: ["/bin/sh"]
+          args: ["/usr/src/git-repo/builder/run.sh"]
+          volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-socket-volume
+          - mountPath: /usr/src/git-repo
+            name: git-repo
+          - mountPath: /usr/src/build-repo
+            name: build-repo
+          securityContext:
+            privileged: true
+      restartPolicy: Never
+      volumes:
+        - name: docker-socket-volume
+          hostPath:
+            path: /var/run/docker.sock
+        - name: git-repo
+          emptyDir: {}
+        - name: build-repo
+          emptyDir: {}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: builder-role
+subjects:
+- kind: ServiceAccount
+  name: builder-role
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: builder-role

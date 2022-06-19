@@ -1,0 +1,1 @@
+envsubst < job.template.yaml > job.yaml
