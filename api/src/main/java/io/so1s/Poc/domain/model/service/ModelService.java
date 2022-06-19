@@ -67,10 +67,7 @@ public class ModelService {
 
         env.put("BUILD_GIT_REPOSITORY", gitFolder.toString());
 
-        launchProcess(new String[] {"/bin/bash", "/usr/src/git-repo/builder/load-template.sh"}, builderFolder, env);
-        launchProcess(new String[] {"kubectl", "delete", "-f", "job.yaml"}, builderFolder);
-        // run builder -> build bentoml images
-        launchProcess(new String[] {"skaffold", "run", "--tail"}, builderFolder);
+        launchProcess(new String[] {"/bin/bash", "/usr/src/git-repo/builder/build.sh"}, builderFolder, env);
     }
 
 }

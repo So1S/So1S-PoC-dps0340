@@ -61,7 +61,6 @@ spec:
         - name: minikube-volume
           hostPath:
             path: /home/dps0340/.minikube
-            type: Directory
         - name: git-repo
           emptyDir: {}
 ---
