@@ -19,7 +19,8 @@ RUN apt install -y \
     gnupg \
     lsb-release \
     apt-transport-https \
-    sudo
+    sudo \
+    gettext-base
 
 # get docker apt repository
 
@@ -49,6 +50,9 @@ RUN apt install -y \
     docker-ce \
     docker-ce-cli \
     kubectl
+
+RUN curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && \
+    sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
 COPY --from=builder /usr/src/java-code/build/libs/*.jar ./app.jar
 

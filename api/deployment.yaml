@@ -48,6 +48,8 @@ spec:
         volumeMounts:
         - mountPath: /var/run/docker.sock
           name: docker-socket-volume
+        - mountPath: /root/.minikube
+          name: minikube-volume
         - mountPath: /usr/src/git-repo
           name: git-repo
         securityContext:
@@ -56,6 +58,10 @@ spec:
         - name: docker-socket-volume
           hostPath:
             path: /var/run/docker.sock
+        - name: minikube-volume
+          hostPath:
+            path: /home/dps0340/.minikube
+            type: Directory
         - name: git-repo
           emptyDir: {}
 ---
