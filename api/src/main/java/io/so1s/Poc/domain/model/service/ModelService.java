@@ -35,7 +35,20 @@ public class ModelService {
 
         var folderUrl = gitFolder.toString();
 
-        var process = new ProcessBuilder(String.format("%s/dockerize.sh", folderUrl)).directory(gitFolder).inheritIO().start();
+        var builderFolder = gitFolder.toPath().resolve("builder").toFile();
+
+
+        var process = new ProcessBuilder(String.format("BUILD_GIT_REPOSITORY=%s /bin/bash /usr/src/git-repo/builder/load-template.sh", folderUrl)).directory(builderFolder).inheritIO().start();
+
+        synchronized (process) {
+            try {
+                process.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        process = new ProcessBuilder("skaffold build").directory(builderFolder).inheritIO().start();
 
         synchronized (process) {
             try {
