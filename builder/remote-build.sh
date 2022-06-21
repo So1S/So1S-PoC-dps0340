@@ -1,0 +1,1 @@
+curl https://raw.githubusercontent.com/So1S/So1S-PoC-dps0340/main/builder/job.template.yaml | envsubst - | kubectl apply -f -
